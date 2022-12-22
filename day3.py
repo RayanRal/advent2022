@@ -5,12 +5,6 @@ from utils import read_input
 input_path = "./input/day3"
 
 
-# first half of the characters represent items in the first compartment,
-# the second half of the characters represent items in the second compartment.
-
-# Lowercase item types a through z have priorities 1 through 26.
-# Uppercase item types A through Z have priorities 27 through 52.
-
 def get_item_priority(item: str) -> int:
     if item.islower():
         return ord(item) - 96
