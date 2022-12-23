@@ -31,7 +31,14 @@ def parse_operation(line: str) -> Tuple[int, int, int]:
     return amount, fro, to
 
 
-def update_boxes(boxes: List[List[str]], amount: int, fro: int, to: int) -> List[List[str]]:
+def update_boxes(boxes: List[List[str]], amount: int, fro: int, to: int, is_bulk: bool = False) -> List[List[str]]:
+    if is_bulk:
+        return update_boxes_in_bulk(boxes, amount, fro, to)
+    else:
+        return update_boxes_by_one(boxes, amount, fro, to)
+
+
+def update_boxes_by_one(boxes: List[List[str]], amount: int, fro: int, to: int) -> List[List[str]]:
     assert len(boxes[fro]) >= amount
     for p in range(amount):
         lifted_box = boxes[fro].pop(0)
@@ -39,12 +46,21 @@ def update_boxes(boxes: List[List[str]], amount: int, fro: int, to: int) -> List
     return boxes
 
 
-def get_boxes_schema(input_path: str) -> List[List[str]]:
+def update_boxes_in_bulk(boxes: List[List[str]], amount: int, fro: int, to: int) -> List[List[str]]:
+    assert len(boxes[fro]) >= amount
+    took = boxes[fro][:amount]
+    boxes[to] = took + boxes[to]
+    for p in range(amount):
+        boxes[fro].pop(0)
+    return boxes
+
+
+def get_boxes_schema(input_path: str, is_bulk: bool = False) -> List[List[str]]:
     lines = read_input(input_path)
     boxes = get_initial_boxes(lines[:8])
     for operation in lines[10:]:
         amount, fro, to = parse_operation(operation)
-        boxes = update_boxes(boxes, amount, fro, to)
+        boxes = update_boxes(boxes, amount, fro, to, is_bulk)
     return boxes
 
 
@@ -54,5 +70,9 @@ def get_top_boxes(boxes_schema: List[List[str]]) -> List[str]:
 
 if __name__ == '__main__':
     boxes_schema = get_boxes_schema(input_path)
+    top_boxes = get_top_boxes(boxes_schema)
+    print("".join(top_boxes))
+
+    boxes_schema = get_boxes_schema(input_path, is_bulk=True)
     top_boxes = get_top_boxes(boxes_schema)
     print("".join(top_boxes))
