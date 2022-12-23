@@ -7,6 +7,8 @@ input_path = "./input/day7"
 
 DIRECTORIES = []
 TRESHOLD = 100000
+TOTAL_SPACE = 70000000
+REQUIRED_SPACE = 30000000
 
 @dataclass
 class FileInfo:
@@ -67,10 +69,20 @@ def scan_all_directories(input_path: str) -> Optional[int]:
         else:
             line_idx = add_info(lines, line_idx, current_dir)
 
-    return line_idx
+    return root_dir
 
 
 if __name__ == '__main__':
-    end_position = scan_all_directories(input_path)
+    root_dir = scan_all_directories(input_path)
     sizes_under_treshold = [dir_size for directory in DIRECTORIES if (dir_size := directory.get_total_size()) < TRESHOLD]
-    print(sum(sizes_under_treshold))
+    print(f"Pt 1. Size of directories under threshold: {sum(sizes_under_treshold)}")
+
+    print(f"Root dir size: {root_dir.get_total_size()}")
+    free_disk_space = TOTAL_SPACE - root_dir.get_total_size()
+    required_to_free = REQUIRED_SPACE - free_disk_space
+    print(f"Free disk space: {free_disk_space}")
+    print(f"Required to free: {required_to_free}")
+    dir_sizes = [directory.get_total_size() for directory in DIRECTORIES]
+    dir_sizes_over_required = [d for d in dir_sizes if d > required_to_free]
+    print(f"Pt 2. Min directory size to delete: {min(dir_sizes_over_required)}")
+
