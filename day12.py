@@ -22,6 +22,15 @@ def get_coordinates(map: List[List[str]]) -> Tuple[Tuple[int, int], Tuple[int, i
     return start, end
 
 
+def get_starts(map: List[List[str]]) -> List[Tuple[int, int]]:
+    starts = []
+    for row_idx in range(len(map)):
+        for col_idx in range(len(map[row_idx])):
+            if map[row_idx][col_idx] in ("S", "a"):
+                starts.append((row_idx, col_idx))
+    return starts
+
+
 def create_visited(map: List[List[str]]) -> List[List[int]]:
     return [[-1] * len(map[x]) for x in range(len(map))]
 
@@ -74,3 +83,13 @@ if __name__ == '__main__':
     for line in visited:
         print(line)
     print(visited[target[0]][target[1]])
+
+    # part 2
+    starts = get_starts(map)
+    target_steps = []
+    for start in starts:
+        visited = create_visited(map)
+        traverse_map(map, visited, start)
+        if visited[target[0]][target[1]] != -1:
+            target_steps.append(visited[target[0]][target[1]])
+    print(min(target_steps))
