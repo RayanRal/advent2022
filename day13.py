@@ -1,5 +1,7 @@
+import functools
 import json
 from enum import Enum
+from typing import List, Tuple
 
 from utils import read_input
 
@@ -31,10 +33,11 @@ def isList(l):
     return isinstance(l, list)
 
 
-def is_correct_order(l1, l2, idx1, idx2) -> CheckResult:
+def is_correct_order(l1, l2) -> CheckResult:
+    idx1, idx2 = 0, 0
     while idx1 < len(l1) and idx2 < len(l2):
         if isList(l1[idx1]) and isList(l2[idx2]):
-            check_result = is_correct_order(l1[idx1], l2[idx2], 0, 0)
+            check_result = is_correct_order(l1[idx1], l2[idx2])
             if check_result != CheckResult.CONTINUE:
                 return check_result
             else:
@@ -66,12 +69,23 @@ def is_correct_order(l1, l2, idx1, idx2) -> CheckResult:
 
 
 if __name__ == '__main__':
-    list_pairs = read_line_pairs(input_path)
+    list_pairs: List[Tuple[str, str]] = read_line_pairs(input_path)
     ordered_pairs = []
     for idx, pair in enumerate(list_pairs, start=1):
         l1 = create_list(pair[0])
         l2 = create_list(pair[1])
-        order = is_correct_order(l1, l2, 0, 0)
+        order = is_correct_order(l1, l2)
         if order == CheckResult.CORRECT:
             ordered_pairs.append(idx)
     print(sum(ordered_pairs))
+
+    # part 2
+    all_lines = [create_list(x) for p in list_pairs for x in [p[0], p[1]]]
+    all_lines += [[[2]], [[6]]]
+
+    sort_key = functools.cmp_to_key(lambda x, y: 1 if is_correct_order(x[:], y[:]) == CheckResult.WRONG else -1)
+    sorted_lines = sorted(all_lines, key=sort_key)
+
+    i1 = sorted_lines.index([[[[2]]]]) + 1
+    i2 = sorted_lines.index([[[[6]]]]) + 1
+    print(i1 * i2)
